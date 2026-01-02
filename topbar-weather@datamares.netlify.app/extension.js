@@ -45,7 +45,10 @@ export default class weatherOClock extends Extension {
   }
 
   disable() {
-    this._positionChangeListener = null
+    if (this._positionChangeListener) {
+      this._settings.disconnect(this._positionChangeListener);
+      this._positionChangeListener = null;
+    }
     this._topBox.remove_child(dateMenu._clockDisplay);
     dateMenu._clockDisplay.remove_style_class_name("label-right-margin");
     dateMenu._clockDisplay.remove_style_class_name("label-left-margin");
@@ -60,6 +63,8 @@ export default class weatherOClock extends Extension {
       panelWeather.destroy();
       panelWeather = null;
     }
+
+    this._settings = null;
   }
 
   _addWidget() {
@@ -123,8 +128,6 @@ const PanelWeather = GObject.registerClass(
         "changed",
         this._onWeatherInfoUpdate.bind(this),
       );
-
-      this._pushSignal(this, "destroy", this._onDestroy.bind(this));
 
       if (this._networkIcon) {
         this._pushSignal(
@@ -208,12 +211,13 @@ const PanelWeather = GObject.registerClass(
       this._weatherUpdateTimeout = null;
     }
 
-    _onDestroy() {
+    destroy() {
       this._canceLongTermUpdateTimeout();
       this._signals.forEach((signal) => signal.obj.disconnect(signal.signalId));
       this._signals = null;
       this._weather = null;
       this._networkIcon = null;
+      super.destroy();
     }
   },
 );
