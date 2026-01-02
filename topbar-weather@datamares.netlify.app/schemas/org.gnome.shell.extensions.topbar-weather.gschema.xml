@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.topbar-weather"
+    path="/org/gnome/shell/extensions/topbar-weather/">
+    <key name="weather-after-clock" type="b">
+      <default>false</default>
+    </key>
+    <key name="show-apparent-temp" type="b">
+      <default>false</default>
+    </key>
+    <key name="hide-units" type="b">
+      <default>false</default>
+    </key>
+  </schema>
+</schemalist>
