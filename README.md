@@ -4,7 +4,7 @@ This is a fork from [Weather O'Clock extension](https://github.com/CleoMenezesJr
 
 <b>GNOME Weather is required for this extension to function.</b>
 
-![Screenshot](img/screenshot.png)
+![Screenshot](img/image.png)
 
 ## Features
 
