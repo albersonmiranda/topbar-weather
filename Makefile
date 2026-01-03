@@ -27,3 +27,9 @@ uninstall:
 	rm -rf $(INSTALLBASE)/$(INSTALLNAME)
 
 .PHONY: clean
+clean:
+	rm -f *.zip
+
+.PHONY: pack
+pack:
+	gnome-extensions pack ./topbar-weather@datamares.netlify.app --extra-source=prefs.ui --force
