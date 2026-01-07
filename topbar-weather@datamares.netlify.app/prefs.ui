@@ -44,6 +44,19 @@
             </child>
           </object>
         </child>
+        <child>
+          <object class="AdwActionRow">
+            <property name="title" translatable="yes">Hide decimals in apparent temperature</property>
+            <property name="subtitle" translatable="yes">Round apparent temperature to nearest integer</property>
+            <property name="activatable-widget">HideApparentDecimals</property>
+            <child>
+              <object class="GtkSwitch" id="HideApparentDecimals">
+                <property name="valign">center</property>
+                <property name="active">False</property>
+              </object>
+            </child>
+          </object>
+        </child>
       </object>
     </child>
   </object>

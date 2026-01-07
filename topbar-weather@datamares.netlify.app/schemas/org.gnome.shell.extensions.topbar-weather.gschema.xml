@@ -11,5 +11,10 @@
     <key name="hide-units" type="b">
       <default>false</default>
     </key>
+    <key name="hide-apparent-decimals" type="b">
+      <default>false</default>
+      <summary>Hide decimals in apparent temperature</summary>
+      <description>When enabled, rounds apparent temperature to nearest integer</description>
+    </key>
   </schema>
 </schemalist>

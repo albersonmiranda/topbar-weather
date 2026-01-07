@@ -40,6 +40,15 @@ export default class WeatherOClockPreferences extends ExtensionPreferences {
       Gio.SettingsBindFlags.DEFAULT,
     );
 
+    const hideApparentDecimals = builder.get_object("HideApparentDecimals");
+    hideApparentDecimals.set_active(window._settings.get_boolean("hide-apparent-decimals"));
+    window._settings.bind(
+      "hide-apparent-decimals",
+      hideApparentDecimals,
+      "active",
+      Gio.SettingsBindFlags.DEFAULT,
+    );
+
     const page = builder.get_object("MainWidget");
     window.add(page);
   }
