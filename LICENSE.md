@@ -1,4 +1,4 @@
-Copyright 2025 Alberson Miranda (albersonmiranda), 2022-2024 Cleo Menezes Jr. (CleoMenezesJr), 2020 Jason Gray (JasonLG1979).
+Copyright 2025-2026 Alberson Miranda (albersonmiranda), 2022-2024 Cleo Menezes Jr. (CleoMenezesJr), 2020 Jason Gray (JasonLG1979).
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
