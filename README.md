@@ -15,7 +15,8 @@ Besides original features (choose right or left side of the clock), this extensi
 
 ## Installation
 
-From Source
+- [GNOME Extensions](https://extensions.gnome.org/extension/9123/topbar-weather/)
+- Or if somehow you need to install it from source:
 
 ```bash
 $ git clone https://github.com/albersonmiranda/topbar-weather
