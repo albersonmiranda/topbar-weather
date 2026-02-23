@@ -7,7 +7,7 @@ import { ExtensionPreferences } from "resource:///org/gnome/Shell/Extensions/js/
 export default class WeatherOClockPreferences extends ExtensionPreferences {
   fillPreferencesWindow(window) {
     window._settings = this.getSettings();
-    window.set_default_size(360, 200);
+    window.set_default_size(360, 500);
 
     const builder = new Gtk.Builder();
     builder.add_from_file(`${this.path}/prefs.ui`);
@@ -45,6 +45,15 @@ export default class WeatherOClockPreferences extends ExtensionPreferences {
     window._settings.bind(
       "hide-apparent-decimals",
       hideApparentDecimals,
+      "active",
+      Gio.SettingsBindFlags.DEFAULT,
+    );
+
+    const showConditions = builder.get_object("ShowConditions");
+    showConditions.set_active(window._settings.get_boolean("show-conditions"));
+    window._settings.bind(
+      "show-conditions",
+      showConditions,
       "active",
       Gio.SettingsBindFlags.DEFAULT,
     );

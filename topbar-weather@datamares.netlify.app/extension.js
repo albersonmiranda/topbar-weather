@@ -106,6 +106,7 @@ const PanelWeather = GObject.registerClass(
       this._settings.connect("changed::show-apparent-temp", () => this._weather.update());
       this._settings.connect("changed::hide-units", () => this._weather.update());
       this._settings.connect("changed::hide-apparent-decimals", () => this._weather.update());
+      this._settings.connect("changed::show-conditions", () => this._weather.update());
 
       this._signals = [];
 
@@ -172,7 +173,7 @@ const PanelWeather = GObject.registerClass(
 
         if (this._settings.get_boolean('show-apparent-temp')) {
           let apparent = weather.info.get_apparent();
-          
+
           if (this._settings.get_boolean('hide-apparent-decimals')) {
             let numericValue = parseFloat(apparent.replace(/[°CF]/g, "").trim());
             if (!isNaN(numericValue)) {
@@ -187,8 +188,18 @@ const PanelWeather = GObject.registerClass(
           } else if (this._settings.get_boolean('hide-units')) {
             apparent = apparent.replace(/[°CF]/g, "").trim();
           }
-          
+
           labelText += ` (${apparent})`;
+        }
+
+        if (this._settings.get_boolean('show-conditions')) {
+          let conditions = weather.info.get_conditions();
+          if (!conditions || conditions === "-") {
+            conditions = weather.info.get_sky();
+          }
+          if (conditions !== "-") {
+            labelText += `, ${conditions}`.toLowerCase();
+          }
         }
 
         this._label.text = labelText;

@@ -16,5 +16,10 @@
       <summary>Hide decimals in apparent temperature</summary>
       <description>When enabled, rounds apparent temperature to nearest integer</description>
     </key>
+    <key name="show-conditions" type="b">
+      <default>false</default>
+      <summary>Show weather conditions</summary>
+      <description>When enabled, shows written weather conditions (e.g., rain, drizzle). If no active weather, shows sky description (e.g., partly cloudy, overcast)</description>
+    </key>
   </schema>
 </schemalist>

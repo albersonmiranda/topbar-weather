@@ -57,6 +57,19 @@
             </child>
           </object>
         </child>
+        <child>
+          <object class="AdwActionRow">
+            <property name="title" translatable="yes">Show Conditions</property>
+            <property name="subtitle" translatable="yes">Show written weather conditions (e.g., rain, drizzle). If no active weather, shows sky description (e.g., partly cloudy, overcast)</property>
+            <property name="activatable-widget">ShowConditions</property>
+            <child>
+              <object class="GtkSwitch" id="ShowConditions">
+                <property name="valign">center</property>
+                <property name="active">False</property>
+              </object>
+            </child>
+          </object>
+        </child>
       </object>
     </child>
   </object>
