@@ -12,6 +12,8 @@ Besides original features (choose right or left side of the clock), this extensi
 
 - Show/hide apparent temperature (feels like)
 - Show/hide temperature unit symbol (°C or °F)
+- Show/hide decimals in apparent temperature
+- Show/hide written conditions (e.g., rain, drizzle) or sky description (e.g., partly cloudly, overcast) if no active weather
 
 ## Installation
 
