@@ -7,9 +7,6 @@ import * as Weather from "resource:///org/gnome/shell/misc/weather.js";
 import * as Main from "resource:///org/gnome/shell/ui/main.js";
 import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
 
-let panelWeather = null;
-let statusArea, dateMenu, weather, network, networkIcon, isWeatherAfterClock;
-
 export default class weatherOClock extends Extension {
   constructor(metadata) {
     super(metadata);
@@ -17,27 +14,29 @@ export default class weatherOClock extends Extension {
     this._topBox = null;
     this._positionChangeListener = null;
     this._settings = null;
+    this._panelWeather = null;
+    this._dateMenu = null;
   }
 
   enable() {
-    if (panelWeather) return
+    if (this._panelWeather) return;
 
-    statusArea = Main.panel.statusArea;
-    dateMenu = statusArea.dateMenu;
-    weather = new Weather.WeatherClient();
-    network = Main.panel._network;
-    networkIcon = network ? network._primaryIndicator : null;
+    const statusArea = Main.panel.statusArea;
+    this._dateMenu = statusArea.dateMenu;
+    const weather = new Weather.WeatherClient();
+    const network = Main.panel._network;
+    const networkIcon = network ? network._primaryIndicator : null;
     this._settings = this.getSettings();
-    panelWeather = new PanelWeather(weather, networkIcon, this._settings);
+    this._panelWeather = new PanelWeather(weather, networkIcon, this._settings);
 
     this._topBox = new St.BoxLayout({
       style_class: "clock",
     });
 
-    dateMenu._clockDisplay.remove_style_class_name("clock");
-    dateMenu._clockDisplay
+    this._dateMenu._clockDisplay.remove_style_class_name("clock");
+    this._dateMenu._clockDisplay
       .get_parent()
-      .replace_child(dateMenu._clockDisplay, this._topBox);
+      .replace_child(this._dateMenu._clockDisplay, this._topBox);
 
 
     this._positionChangeListener = this._settings.connect('changed::weather-after-clock', () => this._addWidget());
@@ -49,42 +48,45 @@ export default class weatherOClock extends Extension {
       this._settings.disconnect(this._positionChangeListener);
       this._positionChangeListener = null;
     }
-    this._topBox.remove_child(dateMenu._clockDisplay);
-    dateMenu._clockDisplay.remove_style_class_name("label-right-margin");
-    dateMenu._clockDisplay.remove_style_class_name("label-left-margin");
+    if (this._topBox && this._dateMenu) {
+      this._topBox.remove_child(this._dateMenu._clockDisplay);
+      this._dateMenu._clockDisplay.remove_style_class_name("label-right-margin");
+      this._dateMenu._clockDisplay.remove_style_class_name("label-left-margin");
+      const parent = this._topBox.get_parent();
+      if (parent)
+        parent.replace_child(this._topBox, this._dateMenu._clockDisplay);
+      this._topBox = null;
+    }
 
-    this._topBox
-      .get_parent()
-      .replace_child(this._topBox, dateMenu._clockDisplay);
-
-    this._topBox = null;
-    weather = null;
-    if (panelWeather) {
-      panelWeather.destroy();
-      panelWeather = null;
+    if (this._panelWeather) {
+      this._panelWeather.destroy();
+      this._panelWeather = null;
     }
 
     this._settings = null;
+    this._dateMenu = null;
   }
 
   _addWidget() {
-    this._topBox.remove_child(dateMenu._clockDisplay);
-    this._topBox.remove_child(panelWeather);
-    dateMenu._clockDisplay.remove_style_class_name("label-right-margin");
-    dateMenu._clockDisplay.remove_style_class_name("label-left-margin");
+    const clockDisplay = this._dateMenu._clockDisplay;
+    if (clockDisplay.get_parent() === this._topBox)
+      this._topBox.remove_child(clockDisplay);
+    if (this._panelWeather.get_parent() === this._topBox)
+      this._topBox.remove_child(this._panelWeather);
+    clockDisplay.remove_style_class_name("label-right-margin");
+    clockDisplay.remove_style_class_name("label-left-margin");
 
-    isWeatherAfterClock = this._settings.get_boolean('weather-after-clock');
-    if (isWeatherAfterClock) {
-      this._topBox.add_child(dateMenu._clockDisplay);
-      this._topBox.add_child(panelWeather);
-      dateMenu._clockDisplay.add_style_class_name("label-right-margin");
+    if (this._settings.get_boolean('weather-after-clock')) {
+      this._topBox.add_child(clockDisplay);
+      this._topBox.add_child(this._panelWeather);
+      clockDisplay.add_style_class_name("label-right-margin");
 
       return
     }
 
-    this._topBox.add_child(panelWeather);
-    this._topBox.add_child(dateMenu._clockDisplay);
-    dateMenu._clockDisplay.add_style_class_name("label-left-margin");
+    this._topBox.add_child(this._panelWeather);
+    this._topBox.add_child(clockDisplay);
+    clockDisplay.add_style_class_name("label-left-margin");
   }
 }
 
@@ -103,12 +105,15 @@ const PanelWeather = GObject.registerClass(
       this._networkIcon = networkIcon;
       this._settings = settings;
 
-      this._settings.connect("changed::show-apparent-temp", () => this._weather.update());
-      this._settings.connect("changed::hide-units", () => this._weather.update());
-      this._settings.connect("changed::hide-apparent-decimals", () => this._weather.update());
-      this._settings.connect("changed::show-conditions", () => this._weather.update());
-
       this._signals = [];
+      for (const key of [
+        "show-apparent-temp",
+        "hide-units",
+        "hide-apparent-decimals",
+        "show-conditions",
+      ]) {
+        this._pushSignal(this._settings, `changed::${key}`, () => this._weather.update());
+      }
 
       this._icon = new St.Icon({
         y_align: Clutter.ActorAlign.CENTER,
@@ -203,7 +208,7 @@ const PanelWeather = GObject.registerClass(
         }
 
         this._label.text = labelText;
-        this.visible = this._icon.icon_name && this._label.text;
+        this.visible = Boolean(this._icon.icon_name && this._label.text);
       }
     }
 
@@ -212,13 +217,13 @@ const PanelWeather = GObject.registerClass(
         this._weather.update();
         this._StartLongTermUpdateTimeout();
       } else if (!networkIcon.visible) {
-        this._canceLongTermUpdateTimeout();
+        this._cancelLongTermUpdateTimeout();
         this.visible = false;
       }
     }
 
     _StartLongTermUpdateTimeout() {
-      this._canceLongTermUpdateTimeout();
+      this._cancelLongTermUpdateTimeout();
       this._weatherUpdateTimeout = GLib.timeout_add_seconds(
         GLib.PRIORITY_LOW,
         600,
@@ -229,7 +234,7 @@ const PanelWeather = GObject.registerClass(
       );
     }
 
-    _canceLongTermUpdateTimeout() {
+    _cancelLongTermUpdateTimeout() {
       if (this._weatherUpdateTimeout) {
         GLib.source_remove(this._weatherUpdateTimeout);
       }
@@ -237,7 +242,7 @@ const PanelWeather = GObject.registerClass(
     }
 
     destroy() {
-      this._canceLongTermUpdateTimeout();
+      this._cancelLongTermUpdateTimeout();
       this._signals.forEach((signal) => signal.obj.disconnect(signal.signalId));
       this._signals = null;
       this._weather = null;
