@@ -53,14 +53,19 @@ export default class weatherOClock extends Extension {
       this._dateMenu._clockDisplay.remove_style_class_name("label-right-margin");
       this._dateMenu._clockDisplay.remove_style_class_name("label-left-margin");
       const parent = this._topBox.get_parent();
-      if (parent)
+      if (parent) {
         parent.replace_child(this._topBox, this._dateMenu._clockDisplay);
-      this._topBox = null;
+      }
     }
 
     if (this._panelWeather) {
       this._panelWeather.destroy();
       this._panelWeather = null;
+    }
+
+    if (this._topBox) {
+      this._topBox.destroy();
+      this._topBox = null;
     }
 
     this._settings = null;
